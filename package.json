@@ -16,6 +16,6 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "ts": "yarn ts-node-dev --transpile-only  --rs --respawn"
+    "ts": "yarn ts-node-dev --transpile-only --rs --respawn"
   }
 }
