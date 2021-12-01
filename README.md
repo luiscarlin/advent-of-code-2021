@@ -9,5 +9,5 @@ yarn install
 
 # run a single script in watch mode
 # "rs" to restart server
-yarn ts ./test/test.ts
+yarn start ./test/test.ts
 ```
