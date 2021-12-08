@@ -21,8 +21,6 @@ function part2() {
 
   const sortedLine = _.sortBy(line);
 
-  const highestLocation = sortedLine[sortedLine.length - 1];
-
   const allFuelCosts = [];
 
   for (let meet of sortedLine) {
