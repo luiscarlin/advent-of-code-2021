@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-import { isContinueStatement } from 'typescript';
 
 let grid = readFileSync('./9/9.in', 'utf8')
   .split('\n')
