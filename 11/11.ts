@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-import { exit } from 'process';
 
 const printGrid = (grid: number[][]) => grid.forEach((row) => console.log(row.join('')));
 
@@ -56,64 +55,67 @@ const flashNodes = (nodesToFlash, grid, flashedInThisStep) => {
     const neighbors = getAllNeighbors(row, col, grid);
 
     neighbors.forEach(([neighRow, neighCol]) => {
-      if (flashedInThisStep) grid[neighRow][neighCol] += 1;
+      if (!flashedInThisStep.includes(`${neighRow},${neighCol}`)) {
+        grid[neighRow][neighCol] += 1;
+      }
     });
 
     flashedInThisStep.push(`${row},${col}`);
+    grid[row][col] = 0;
   }
 };
 
-let currentGrid = readFileSync('./11/test.in', 'utf8')
-  .split('\n')
-  .map((row) => row.split('').map(Number));
+function solve(partTwo = false) {
+  let currentGrid = readFileSync('./11/11.in', 'utf8')
+    .split('\n')
+    .map((row) => row.split('').map(Number));
 
-let step = 0;
-// const NUM_STEPS = 100
-const NUM_STEPS = 2;
+  let step = 1;
+  const NUM_STEPS = partTwo ? 10000 : 100;
 
-while (step !== NUM_STEPS) {
-  console.log('step', step);
+  let totalNumFlashes = 0;
 
-  const flashedInThisStep = [];
+  const totalNumberOfItems = currentGrid.length * currentGrid[0].length;
 
-  console.log('\nbefore:\n');
+  while (step <= NUM_STEPS) {
+    const flashedInThisStep = [];
 
-  printGrid(currentGrid);
-
-  for (let row = 0; row < currentGrid.length; row++) {
-    for (let col = 0; col < currentGrid[row].length; col++) {
-      currentGrid[row][col] += 1;
+    for (let row = 0; row < currentGrid.length; row++) {
+      for (let col = 0; col < currentGrid[row].length; col++) {
+        currentGrid[row][col] += 1;
+      }
     }
+
+    let nodesToFlash = getAllNodesReadyToFlash(flashedInThisStep, currentGrid);
+
+    while (nodesToFlash.length > 0) {
+      flashNodes(nodesToFlash, currentGrid, flashedInThisStep);
+      totalNumFlashes += nodesToFlash.length;
+
+      nodesToFlash = getAllNodesReadyToFlash(flashedInThisStep, currentGrid);
+    }
+
+    if (partTwo) {
+      console.log(
+        'step:',
+        step,
+        'total:',
+        totalNumberOfItems,
+        'flashed:',
+        flashedInThisStep.length,
+        'percent flashed:',
+        (flashedInThisStep.length / totalNumberOfItems) * 100,
+      );
+
+      if (flashedInThisStep.length === totalNumberOfItems) {
+        return step;
+      }
+    }
+
+    step += 1;
   }
-
-  let nodesToFlash = getAllNodesReadyToFlash(flashedInThisStep, currentGrid);
-
-  console.log(nodesToFlash);
-
-  while (nodesToFlash.length > 0) {
-    flashNodes(nodesToFlash, currentGrid, flashedInThisStep);
-    console.log(flashedInThisStep);
-
-    nodesToFlash = getAllNodesReadyToFlash(flashedInThisStep, currentGrid);
-    exit();
-  }
-
-  // for (let row = 0; row < currentGrid.length; row++) {
-  //   for (let col = 0; col < currentGrid[row].length; col++) {
-  //     if (currentGrid[row][col] > 9) {
-  //       // get all neighbors
-  //       const neighbors = getAllNeighbors(row, col, currentGrid);
-
-  //       neighbors.forEach(([neighRow, neighCol]) => {});
-
-  //       console.log('neighbors', neighbors);
-  //     }
-  //   }
-  // }
-
-  console.log('\nafter:\n');
-
-  printGrid(currentGrid);
-
-  step += 1;
+  return totalNumFlashes;
 }
+
+console.log('part 1:', solve());
+console.log('part 2:', solve(true));
